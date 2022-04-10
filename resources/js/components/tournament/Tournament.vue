@@ -19,72 +19,105 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        <td class="team"><h4>
-                            Birdies
-                        </h4></td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                    </tr>
+                    <team-summary v-for="(summary, index) in summaries" :key="index"
+                                  :summary="summary"
+                                  class="team">
+                    </team-summary>
                     </tbody>
                 </table>
             </div>
             <div class="col-3">
-                <div class="row">
-<!--                    <div class="col-4 mb-4" v-for="(fixture, index) in fixtures" :key="index">-->
-<!--                        <fixture-->
-<!--                            :fixture="fixture"-->
-<!--                            class="fixture">-->
-<!--                        </fixture>-->
-<!--                    </div>-->
+                <div class="mb-4" v-for="(fixture, index) in fixtures" :key="index">
+                    <fixture
+                        :fixture="fixture"
+                        class="fixture">
+                    </fixture>
                 </div>
             </div>
             <div class="col-3">
-                Predictions
+                <div class="card">
+                    <div class="card-header text-white bg-dark">
+                        <h4>
+                            Championship Predictions
+                        </h4>
+                    </div>
+
+                    <div class="card-body">
+                        <prediction v-for="(summary, index) in summaries" :key="index"
+                                    :summary="summary"
+                                    class="team">
+                        </prediction>
+                    </div>
+                </div>
             </div>
-            <!--            <div class="col-4 mb-4" v-for="(fixture, index) in fixtures" :key="index">-->
-            <!--                <fixture-->
-            <!--                    :fixture="fixture"-->
-            <!--                    class="fixture">-->
-            <!--                </fixture>-->
-            <!--            </div>-->
         </div>
         <div class="row">
-            <!--            <div class="col-12">-->
-            <!--                <router-link :to="{ name: 'Fixtures' }" class="btn btn-lg btn-dark">Display Item</router-link>-->
-            <!--            </div>-->
+            <div class="col-6">
+                <div class="btn btn-lg btn-dark" @click="switchToNextWeek()" id="playNext" ref="playNext">Play Next Week</div>
+            </div>
+            <div class="col-6">
+                <div class="btn btn-lg btn-danger" @click="resetAllGames()">Reset Data</div>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
-// import Fixture from './Fixture.vue';
+import TeamSummary from './TeamSummary.vue';
+import Fixture from '../fixtures/Fixture.vue';
+import Prediction from './Prediction';
 
 export default {
-    // props: ['teams'],
-    // components: {
-    //     Fixture,
-    // },
+    components: {
+        Prediction,
+        TeamSummary,
+        Fixture,
+    },
 
-    // data: function () {
-    //     return {
-    //         fixtures: [],
-    //     };
-    // },
+    data: function () {
+        return {
+            summaries: [],
+            fixtures: [],
+            week: 0,
+            nextWeek: 0,
+            isLast : false,
+        };
+    },
 
     methods: {
-        // getFixtures() {
-        //     axios.get('api/fixtures')
-        //         .then(response => {
-        //             this.fixtures = response.data;
-        //         })
-        //         .catch(error => {
-        //             console.log(error);
-        //         });
-        // },
+        getWeekResults() {
+            axios.get('/api/tournament/' + this.$route.params.week)
+                .then(response => {
+                    this.summaries = response.data.summaries;
+                    this.fixtures = response.data.fixtures;
+                    this.week = this.$route.params.week;
+                    this.nextWeek = parseInt(this.$route.params.week) + 1;
+                    this.isLast = response.data.is_last
+                    this.$forceUpdate();
+
+                    if (this.isLast) {
+                        this.$refs.playNext.classList.add('disabled');
+                    }
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        },
+        switchToNextWeek() {
+            if (!this.isLast) {
+                this.$router.replace('/tournament/' + this.nextWeek);
+                this.getWeekResults();
+            }
+        },
+        resetAllGames() {
+            axios.post('/api/reset/')
+                .then(response => {
+                    this.$router.push({name: 'Teams'});
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        },
     },
 
     mounted() {
@@ -92,7 +125,7 @@ export default {
     },
 
     created() {
-        // this.getFixtures();
+        this.getWeekResults();
     },
 };
 </script>

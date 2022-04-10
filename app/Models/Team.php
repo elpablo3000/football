@@ -35,10 +35,18 @@ class Team extends Model
     public function firstPlays() {
         return $this->hasMany('App\Models\Play', 'team_first_id', 'id');
     }
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function secondPlays() {
         return $this->hasMany('App\Models\Play', 'team_second_id', 'id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function fixtureResults() {
+        return $this->hasMany('App\Models\FixtureResult');
     }
 }

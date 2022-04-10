@@ -29,6 +29,7 @@ class Play extends Model
 
 	protected $casts = [
 		'fixture_id' => 'int',
+		'played' => 'int',
 		'team_first_id' => 'int',
 		'team_first_result' => 'int',
 		'team_second_id' => 'int',

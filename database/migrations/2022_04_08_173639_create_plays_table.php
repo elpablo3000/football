@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('plays', function (Blueprint $table) {
             $table->id();
             $table->integer('fixture_id');
+            $table->boolean('played')->default(false);
             $table->integer('team_first_id');
             $table->integer('team_first_result')->nullable();
             $table->integer('team_second_id');

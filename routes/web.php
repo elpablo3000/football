@@ -25,5 +25,8 @@ Route::get('/route-name/?{name}', function(){
 
 Route::get('api/teams', [App\Http\Controllers\TeamsController::class, 'index'])->name('api/teams');
 Route::get('api/fixtures', [App\Http\Controllers\FixturesController::class, 'index'])->name('api/fixtures');
+Route::get('api/tournament/{weekNumber}', [App\Http\Controllers\TournamentController::class, 'index'])->name('api/tournament');
+Route::post('api/reset', [App\Http\Controllers\ResetController::class, 'index'])->name('api/tournament');
 
 //Route::get('fixtures', [App\Http\Controllers\FixturesController::class, 'index'])->name('fixtures');
+Route::get('tournament/{weekNumber}', [App\Http\Controllers\TournamentController::class, 'index'])->name('tournament');

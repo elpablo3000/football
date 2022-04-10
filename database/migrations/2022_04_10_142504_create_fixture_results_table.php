@@ -15,6 +15,14 @@ return new class extends Migration
     {
         Schema::create('fixture_results', function (Blueprint $table) {
             $table->id();
+            $table->integer('team_id');
+            $table->integer('week_number');
+            $table->integer('played');
+            $table->integer('won');
+            $table->integer('drawn');
+            $table->integer('loosed');
+            $table->integer('goal_difference');
+            $table->integer('predictions');
             $table->timestamps();
         });
     }
