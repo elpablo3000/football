@@ -29,4 +29,4 @@ Route::get('api/tournament/{weekNumber}', [App\Http\Controllers\TournamentContro
 Route::post('api/reset', [App\Http\Controllers\ResetController::class, 'index'])->name('api/tournament');
 
 //Route::get('fixtures', [App\Http\Controllers\FixturesController::class, 'index'])->name('fixtures');
-Route::get('tournament/{weekNumber}', [App\Http\Controllers\TournamentController::class, 'index'])->name('tournament');
+//Route::get('tournament/{weekNumber}', [App\Http\Controllers\TournamentController::class, 'index'])->name('tournament');

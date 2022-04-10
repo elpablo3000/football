@@ -13,6 +13,12 @@ class TournamentService {
     private $maxDefaultGoals = 5;
     private $defaultGoals = 3;
 
+    /**
+     * Get summaries from selected week or generate them
+     *
+     * @param $week
+     * @return TournamentResponse
+     */
     public function getWeekSummaries($week) {
         $response = new TournamentResponse();
         $this->fixtures = $this->getFixturesForWeek($week + 1);
@@ -35,6 +41,12 @@ class TournamentService {
         return $response;
     }
 
+    /**
+     * Get summaries from db
+     *
+     * @param $week
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
+     */
     private function getWeekSummariesFromDB($week) {
         return FixtureResult::query()
             ->where('week_number', $week)
@@ -42,6 +54,11 @@ class TournamentService {
             ->get();
     }
 
+    /**
+     * Generate summaries for week
+     *
+     * @param $week
+     */
     private function generateWeekSummaries($week) {
         if ($week == 0) {
             $this->generateZeroResults();
@@ -54,8 +71,11 @@ class TournamentService {
         }
     }
 
-
-
+    /**
+     * Play the games for week
+     *
+     * @param $week
+     */
     private function playGames($week) {
         if ($week != 0) {
             $currentFixture = Fixture::query()->where('week_number', $week)->first();
@@ -70,7 +90,15 @@ class TournamentService {
         }
     }
 
-    //TODO: write separate logic if no games played by any of them
+    /**
+     * Play the game based on previous average goals
+     *
+     * @param $play
+     * @param $firstTeamGoalAvg
+     * @param $secondTeamGoalAvg
+     *
+     * TODO: write separate logic if no games played by any of them
+     */
     private function playGame($play, $firstTeamGoalAvg, $secondTeamGoalAvg) {
         $firstTeamGoalAvg = $firstTeamGoalAvg == 0 ? 1 : $firstTeamGoalAvg;
         $secondTeamGoalAvg = $secondTeamGoalAvg == 0 ? 1 : $secondTeamGoalAvg;
@@ -96,6 +124,12 @@ class TournamentService {
         $play->save();
     }
 
+    /**
+     * Count the AVG amount of goals for selected team
+     *
+     * @param $teamId
+     * @return float|int
+     */
     private function getTeamGoalsAvg($teamId) {
         $goalsAvg = $this->defaultGoals;
         $results = [];
@@ -121,6 +155,9 @@ class TournamentService {
         return $goalsAvg;
     }
 
+    /**
+     * Generate summaries for 0 week
+     */
     private function generateZeroResults() {
         $teams = Team::query()->orderBy('name')->get();
         foreach ($teams as $team) {
@@ -137,6 +174,12 @@ class TournamentService {
         }
     }
 
+    /**
+     * Generate summaries for selected week
+     *
+     * @param $week
+     * @param false $final
+     */
     private function generateWeekResults($week, $final = false) {
         $lastGeneratedResults = $this->getWeekSummaries($week - 1);
         foreach ($lastGeneratedResults->summaries as $summary) {
@@ -154,6 +197,12 @@ class TournamentService {
         }
     }
 
+    /**
+     * Get the amount of games played for selected team
+     *
+     * @param $teamId
+     * @return int
+     */
     private function getPlayedCountForTeam($teamId) {
         return Play::query()
             ->where('team_first_id', $teamId)
@@ -163,6 +212,12 @@ class TournamentService {
             ->count();
     }
 
+    /**
+     * Get the amount of games won for selected team
+     *
+     * @param $teamId
+     * @return int
+     */
     private function getWonCountForTeam($teamId) {
         $count = Play::query()
             ->where('team_first_id', $teamId)
@@ -180,6 +235,12 @@ class TournamentService {
         return $count;
     }
 
+    /**
+     * Get the amount of games drawn for selected team
+     *
+     * @param $teamId
+     * @return int
+     */
     private function getDrawnCountForTeam($teamId) {
         $count = Play::query()
             ->where('team_first_id', $teamId)
@@ -197,6 +258,12 @@ class TournamentService {
         return $count;
     }
 
+    /**
+     * Get the amount of games loosed for selected team
+     *
+     * @param $teamId
+     * @return int
+     */
     private function getLoosedCountForTeam($teamId) {
         $count = Play::query()
             ->where('team_first_id', $teamId)
@@ -214,6 +281,12 @@ class TournamentService {
         return $count;
     }
 
+    /**
+     * Get the GD for selected team
+     *
+     * @param $teamId
+     * @return mixed
+     */
     private function getGDForTeam($teamId) {
         $count = Play::query()
             ->where('team_first_id', $teamId)
@@ -229,11 +302,23 @@ class TournamentService {
         return $count;
     }
 
+    /**
+     * Count the chance of winning for selected team
+     *
+     * @param $teamId
+     * @return int
+     */
     private function getPredictionsForTeam($teamId) {
         //TODO: do some calculations for this parameter
         return 0;
     }
 
+    /**
+     * Get the list of fixtures for week and previous weeks
+     *
+     * @param $week
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
+     */
     private function getFixturesForWeek($week) {
         $fixtureService = new FixtureService();
         $fixtures = $fixtureService->getFixtures();

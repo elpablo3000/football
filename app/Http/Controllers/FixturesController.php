@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Services\FixtureService;
-use App\Models\Team;
 
 class FixturesController extends Controller
 {

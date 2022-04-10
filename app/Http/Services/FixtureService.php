@@ -7,21 +7,35 @@ use App\Models\Play;
 use App\Models\Team;
 
 class FixtureService {
+    /**
+     * Generate fixtures or get it from DB if they are alredy generated
+     *
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
+     */
     public function getFixtures() {
         $fixtures = $this->getFixturesFromDb();
         if ($fixtures->count() > 0) {
             return $fixtures;
         } else {
+            //TODO: generation works wrong, fix it
             $this->generateFixtures();
             $fixtures = $this->getFixturesFromDb();
         }
         return $fixtures;
     }
 
+    /**
+     * Get fixtures from DB
+     *
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
+     */
     private function getFixturesFromDb() {
         return Fixture::query()->with('plays', 'plays.teamFirst', 'plays.teamSecond')->get();
     }
 
+    /**
+     * Generate the fixtures and save to DB
+     */
     private function generateFixtures() {
         $teams = Team::query()->get();
 
@@ -47,6 +61,12 @@ class FixtureService {
         }
     }
 
+    /**
+     * Generate the team matrix to make fixtures
+     *
+     * @param $teams
+     * @return array
+     */
     private function generateTeamsHalfMatrix($teams) {
         //shuffle the ids of commands to make random combinations
         $teamsIds = $teams->pluck('id')->shuffle();
