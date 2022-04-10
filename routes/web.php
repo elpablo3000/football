@@ -16,3 +16,14 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+
+Route::get('/route-name/?{name}', function(){
+    return redirect('/');
+})->where('name', '[A-Za-z]+');
+
+
+Route::get('api/teams', [App\Http\Controllers\TeamsController::class, 'index'])->name('api/teams');
+Route::get('api/fixtures', [App\Http\Controllers\FixturesController::class, 'index'])->name('api/fixtures');
+
+//Route::get('fixtures', [App\Http\Controllers\FixturesController::class, 'index'])->name('fixtures');
