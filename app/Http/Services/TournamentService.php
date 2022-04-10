@@ -10,6 +10,8 @@ use App\Models\Team;
 
 class TournamentService {
     private $fixtures;
+    private $fixturesCount;
+    private $isLast = false;
     private $maxDefaultGoals = 5;
     private $defaultGoals = 3;
 
@@ -23,18 +25,19 @@ class TournamentService {
         $response = new TournamentResponse();
         $this->fixtures = $this->getFixturesForWeek($week + 1);
 
+        if ($week == $this->fixturesCount) {
+            $this->isLast = true;
+        } else {
+            $this->isLast = false;
+        }
+
         $summaries = $this->getWeekSummariesFromDB($week);
         if ($summaries->count() < 1) {
             $this->generateWeekSummaries($week);
             $summaries = $this->getWeekSummariesFromDB($week);
         }
 
-        if ($week == $this->fixtures->count()) {
-            $response->is_last = true;
-        } else {
-            $response->is_last = false;
-        }
-
+        $response->is_last = $this->isLast;
         $response->fixtures = $this->fixtures;
         $response->summaries = $summaries;
 
@@ -62,8 +65,7 @@ class TournamentService {
     private function generateWeekSummaries($week) {
         if ($week == 0) {
             $this->generateZeroResults();
-        } elseif ($this->fixtures->count() == $week) {
-            //TODO: generate final counts
+        } elseif ($this->isLast) {
             $this->generateWeekResults($week, true);
         } else {
             $this->playGames($week);
@@ -222,13 +224,11 @@ class TournamentService {
         $count = Play::query()
             ->where('team_first_id', $teamId)
             ->where('team_first_result', '>', 'team_second_result')
-            ->having('played', true)
             ->get()
             ->count();
         $count += Play::query()
             ->where('team_second_id', $teamId)
             ->where('team_second_result', '>', 'team_first_result')
-            ->having('played', true)
             ->get()
             ->count();
 
@@ -268,13 +268,11 @@ class TournamentService {
         $count = Play::query()
             ->where('team_first_id', $teamId)
             ->where('team_first_result', '<', 'team_second_result')
-            ->having('played', true)
             ->get()
             ->count();
         $count += Play::query()
             ->where('team_second_id', $teamId)
             ->where('team_second_result', '<', 'team_first_result')
-            ->having('played', true)
             ->get()
             ->count();
 
@@ -290,12 +288,10 @@ class TournamentService {
     private function getGDForTeam($teamId) {
         $count = Play::query()
             ->where('team_first_id', $teamId)
-            ->having('played', true)
             ->get()
             ->sum('team_first_result');
         $count += Play::query()
             ->where('team_second_id', $teamId)
-            ->having('played', true)
             ->get()
             ->sum('team_second_result');
 
@@ -322,6 +318,7 @@ class TournamentService {
     private function getFixturesForWeek($week) {
         $fixtureService = new FixtureService();
         $fixtures = $fixtureService->getFixtures();
+        $this->fixturesCount = $fixtures->count();
 
         return $fixtures->take($week);
     }

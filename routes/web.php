@@ -30,3 +30,9 @@ Route::post('api/reset', [App\Http\Controllers\ResetController::class, 'index'])
 
 //Route::get('fixtures', [App\Http\Controllers\FixturesController::class, 'index'])->name('fixtures');
 //Route::get('tournament/{weekNumber}', [App\Http\Controllers\TournamentController::class, 'index'])->name('tournament');
+Route::get('fixtures', function () {
+    return redirect('/');
+});
+Route::get('tournament/{weekNumber}', function () {
+    return redirect('/');
+});

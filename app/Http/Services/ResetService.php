@@ -3,6 +3,7 @@
 namespace App\Http\Services;
 
 use App\Models\Fixture;
+use App\Models\FixtureResult;
 use App\Models\Play;
 
 class ResetService {
@@ -12,6 +13,7 @@ class ResetService {
     public function resetFixturesAndPlays() {
         $this->resetPlays();
         $this->resetFixtures();
+        $this->resetFixturesResults();
     }
 
     /**
@@ -26,5 +28,12 @@ class ResetService {
      */
     private function resetFixtures() {
         Fixture::query()->delete();
+    }
+
+    /**
+     * Reset fixtures
+     */
+    private function resetFixturesResults() {
+        FixtureResult::query()->delete();
     }
 }
